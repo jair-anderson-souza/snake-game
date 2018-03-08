@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ncurses.h>
+#include "screen.h"
 
 
 int setupScreen(){
@@ -18,9 +19,10 @@ void killScreen(){
 	endwin();
 }
 
+
 int main(int argc, char const *argv[])
 {
-	//    printw("Checker board (stipple)     "); addch(ACS_CKBOARD); printw("\n");
+	printw("Checker board (stipple)     "); addch(ACS_CKBOARD); printw("\n");
     initScreen();
 
     int ch = getch();
