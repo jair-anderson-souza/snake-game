@@ -25,6 +25,7 @@ void drawMenu(){
 	int coordy = (LINES / 2) - 1;
 	mvprintw(coordy, coordx-9, "Snake Game");
 	mvprintw(coordy+1, coordx-14, "Press Enter to Start");
+	mvprintw(coordy+2, coordx-12, "Press ESC to Exit");
 }
 
 void draw(int *xmax, int *ymax){
@@ -57,14 +58,27 @@ void shutdown(Board* board){
 	killScreen();
 }
 
-Board* createBoard(Board* board, int x, int y){
-	Board* board2 = (Board*) malloc(sizeof(Board));	
-	Snake* snake = (Snake*) malloc(sizeof(Snake));
-	board2->snake = snake;
-	board2->coordinatex = x;
-	board2->coordinatey = y;
-	shutdown(board2);
-	return board2;
+Board* createBoard(int x, int y){
+	Board* board = (Board*) malloc(sizeof(Board));	
+	if(board != NULL){
+		board->coordinatex = x;
+		board->coordinatey = y;
+		return board;
+	}
+	//lembrar de pesquisar como mandar erro pra tela
+	return NULL;
+	
+}
+
+Snake* createSnake(Board* board, int x, int y){
+	Snake* snake = (Snake*) malloc(sizeof(Snake));	
+	if(snake != NULL){
+		snake->coordinatex = x;
+		snake->coordinatey = y;
+		board->snake = snake;
+		return snake;
+	}
+	
 }
 
 //see addch(ACS_CKBOARD); printw("\n");
@@ -72,10 +86,24 @@ int main(int argc, char const *argv[])
 {	
 	draw(&xmax, &ymax);
     
-	Board* board = createBoard(board, xmax, ymax);
+	Board* board = createBoard(xmax, ymax);
 
 	drawMenu();
+	createSnake(board, xmax, ymax);
+
+	int key = getch();
+
+//27 ESC
+//10 ENTER
+
+	//if(key == 27){
+	//	printw("Jogo Finalizado", key);
+	//	killScreen();
+	//	exit(0);
+	//}
+
 	
+
 
 	//mvaddch = esse comando coloca o caracter no X,Y específico
 	/*while(board->snake) {
@@ -102,8 +130,6 @@ int main(int argc, char const *argv[])
 
   	}
 */
-
-    getch();
-    killScreen();
+	
     return 0;
 }
