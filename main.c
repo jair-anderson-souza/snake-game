@@ -5,16 +5,16 @@
 
 typedef struct snake Snake;
 struct snake{
-	int coordinatex;
 	int coordinatey;
+	int coordinatex;
 	Snake* next;
 };
 
-typedef struct board Board;
-struct board{
+typedef struct screen Screen;
+struct screen{
 	Snake* snake;
-	int coordinatex;
 	int coordinatey;
+	int coordinatex;
 };
 
 int xmax, ymax;
@@ -28,7 +28,7 @@ void drawMenu(){
 	mvprintw(coordy+2, coordx-12, "Press ESC to Exit");
 }
 
-void draw(int *xmax, int *ymax){
+void draw(int *ymax, int *xmax){
 	initscr();
 	noecho();	
 	cbreak();
@@ -46,53 +46,90 @@ void freeSnake(Snake* snake){
 	free(snake);
 }
 
-void freeBoard(Board* board){
-    free(board);
+void freeBoard(Screen* screen){
+    free(screen);
 }
 
-void shutdown(Board* board){
+void shutdown(Screen* screen){
 	printw("O programa foi finalizado, aperte Enter pra sair!!");
 	getch();
-	freeSnake(board->snake);
-	freeBoard(board);
+	freeSnake(screen->snake);
+	freeBoard(screen);
 	killScreen();
 }
 
-Board* createBoard(int x, int y){
-	Board* board = (Board*) malloc(sizeof(Board));	
-	if(board != NULL){
-		board->coordinatex = x;
-		board->coordinatey = y;
-		return board;
+Screen* createScreen(Snake* snake, int y, int x){
+	Screen* screen = (Screen*) malloc(sizeof(Screen));	
+	if(screen != NULL){
+		screen->coordinatey = y;
+		screen->coordinatex = x;
+		screen->snake = snake;
+		return screen;
 	}
 	//lembrar de pesquisar como mandar erro pra tela
 	return NULL;
 	
 }
-
-Snake* createSnake(Board* board, int x, int y){
+//return some error e.g.
+Snake* createSnake(int y, int x){
 	Snake* snake = (Snake*) malloc(sizeof(Snake));	
 	if(snake != NULL){
-		snake->coordinatex = x;
 		snake->coordinatey = y;
-		board->snake = snake;
+		snake->coordinatex = x;
 		return snake;
 	}
 	
 }
 
-//see addch(ACS_CKBOARD); printw("\n");
-int main(int argc, char const *argv[])
-{	
-	draw(&xmax, &ymax);
+void display_points(Snake* snake) {
+  while(snake != NULL) {
+	mvaddch(snake->coordinatey, snake->coordinatex, ACS_DIAMOND);
+    snake = snake->next;
+  }
+}
+
+void display_points2(Snake* snake) {
+  
+
+}
+
+int main(int argc, char const *argv[]){	
+	draw(&ymax, &xmax);
     
-	Board* board = createBoard(xmax, ymax);
+	Screen* screen = createScreen(createSnake(ymax, xmax), ymax, xmax);
 
-	drawMenu();
-	createSnake(board, xmax, ymax);
+	//Essa função é o Menu que eu ainda pretendo fazer
+	//drawMenu();
 
-	int key = getch();
+	mvaddch(screen->snake->coordinatey-1, screen->snake->coordinatex-1, ACS_BLOCK);
+	refresh();
 
+
+
+
+
+	/*while(true) {
+    	int key = getch();
+    	switch(key){
+    		case KEY_LEFT:
+    			display_points(screen->snake);
+				refresh();
+				display_points2(screen->snake);
+				break;
+    		case KEY_RIGHT:
+				display_points(screen->snake);
+    			refresh();
+				break;
+    		case KEY_UP:
+    			display_points(screen->snake);
+				refresh();
+				break;
+    		case KEY_DOWN:
+				display_points(screen->snake);
+    			refresh();
+				break;
+    	}
+	}
 //27 ESC
 //10 ENTER
 
@@ -114,7 +151,8 @@ int main(int argc, char const *argv[])
     	int key = getch();
     	switch(key){
     		case KEY_LEFT:
-    			mvaddch(board->snake->coordinatex, board->snake->coordinatey-1, ACS_DIAMOND);
+    			display_points();
+				mvaddch(board->snake->coordinatex, board->snake->coordinatey-1, ACS_DIAMOND);
     			break;
     		case KEY_RIGHT:
     			mvaddch(board->snake->coordinatex+1, board->snake->coordinatey, ACS_DIAMOND);
@@ -130,6 +168,7 @@ int main(int argc, char const *argv[])
 
   	}
 */
-	
+	getch();
+	killScreen();
     return 0;
 }
