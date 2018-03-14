@@ -3,6 +3,7 @@
 #include <ncurses.h>
 #include <time.h>
 
+
 typedef struct snake Snake;
 struct snake{
 	int coordinatey;
@@ -17,8 +18,61 @@ struct screen{
 	int coordinatex;
 };
 
-int xmax, ymax;
+Screen* createScreen(Snake* snake, int y, int x){
+	Screen* screen = (Screen*) malloc(sizeof(Screen));	
+	if(screen != NULL){
+		screen->coordinatey = y;
+		screen->coordinatex = x;
+		screen->snake = snake;
+		return screen;
+	}
+	//lembrar de pesquisar como mandar erro pra tela
+	return NULL;
 	
+}
+
+int calculateMiddleScreen(int value){
+	return value / 2;
+}
+
+//return some error e.g.
+Snake* createSnake(int y, int x){
+	int middley = calculateMiddleScreen(y);
+	int middlex = calculateMiddleScreen(x);
+	Snake* snake = (Snake*) malloc(sizeof(Snake));	
+	if(snake != NULL){
+		snake->coordinatey = middley;
+		snake->coordinatex = middlex;
+		return snake;
+	}
+}	
+
+int moveOnKeyboard(){
+	int ch = getch();
+	switch(ch){
+		case KEY_LEFT:
+			return KEY_LEFT;
+			break;
+		case KEY_RIGHT:
+			return KEY_RIGHT;
+			break;
+		case KEY_UP:
+			return KEY_UP;
+			break;
+		case KEY_DOWN:
+			return KEY_DOWN;
+			break;
+		default:
+			NULL;
+	}
+}
+
+void showSnake(Snake* snake){
+	while(true){
+		mvaddch(snake->coordinatey, snake->coordinatex, ACS_DIAMOND);
+		wrefresh(stdscr);
+	}
+}
 
 void drawMenu(){
 	int coordx = (COLS / 2) - 1;
@@ -58,55 +112,77 @@ void shutdown(Screen* screen){
 	killScreen();
 }
 
-Screen* createScreen(Snake* snake, int y, int x){
-	Screen* screen = (Screen*) malloc(sizeof(Screen));	
-	if(screen != NULL){
-		screen->coordinatey = y;
-		screen->coordinatex = x;
-		screen->snake = snake;
-		return screen;
+void moveSnake(Snake* snake) {
+	while(snake != NULL){
+		snake->coordinatex = snake->coordinatex - 1;
+		mvaddch(snake->coordinatey, snake->coordinatex, ACS_DIAMOND);
+		refresh();
+		snake = snake->next;
 	}
-	//lembrar de pesquisar como mandar erro pra tela
-	return NULL;
-	
-}
-//return some error e.g.
-Snake* createSnake(int y, int x){
-	Snake* snake = (Snake*) malloc(sizeof(Snake));	
-	if(snake != NULL){
-		snake->coordinatey = y;
-		snake->coordinatex = x;
-		return snake;
-	}
-	
-}
-
-void display_points(Snake* snake) {
-  while(snake != NULL) {
-	mvaddch(snake->coordinatey, snake->coordinatex, ACS_DIAMOND);
-    snake = snake->next;
-  }
-}
-
-void display_points2(Snake* snake) {
-  
 
 }
 
+
+//a coordenada y é de cima pra baixo no ecrã
 int main(int argc, char const *argv[]){	
-	draw(&ymax, &xmax);
-    
+	int xmax, ymax;
+	initscr();
+	noecho();	
+	cbreak();
+	keypad(stdscr, TRUE); //teclas do teclado funcionarem
+	curs_set(0); //desabilitar cursor
+	timeout(100);
+	getmaxyx(stdscr, ymax, xmax); // recupera as as coordenadas da tela -1
+	
 	Screen* screen = createScreen(createSnake(ymax, xmax), ymax, xmax);
+	
+	while(true){
+		clear();
+		moveSnake(screen->snake);
+		int key = getch();
+    	switch(key){
+    		case KEY_LEFT:
+    		//	showSnake(screen->snake, );
+				refresh();
+				break;
+    		case KEY_RIGHT:
+			//	showSnake(screen->snake, KEY_RIGHT);
+    			refresh();
+				break;
+    		case KEY_UP:
+			//	showSnake(screen->snake, KEY_UP);
+    			refresh();
+				break;
+    		case KEY_DOWN:
+			//	showSnake(screen->snake, KEY_DOWN);
+				refresh();
+				break;
+			default:
+				break;
+			}
+	}
+	mvaddch(screen->snake->coordinatey-10, screen->snake->coordinatex-1, ACS_BLOCK);
+	//showSnake(screen->snake, KEY_RIGHT);
+	getch(); killScreen();
+    return 0;
+}
+	 
+
+
+
+	//key = nextMove(screen->snake);
+
+	//showSnake(screen->snake);
+
+
 
 	//Essa função é o Menu que eu ainda pretendo fazer
 	//drawMenu();
 
-	mvaddch(screen->snake->coordinatey-1, screen->snake->coordinatex-1, ACS_BLOCK);
-	refresh();
+	
+	//moveSnake(screen->snake);
 
-
-
-
+	// refresh();
 
 	/*while(true) {
     	int key = getch();
@@ -168,7 +244,4 @@ int main(int argc, char const *argv[]){
 
   	}
 */
-	getch();
-	killScreen();
-    return 0;
-}
+
