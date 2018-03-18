@@ -27,8 +27,7 @@ Screen* createScreen(Snake* snake, int y, int x){
 		return screen;
 	}
 	//lembrar de pesquisar como mandar erro pra tela
-	return NULL;
-	
+	return NULL;	
 }
 
 int calculateMiddleScreen(int value){
@@ -46,33 +45,6 @@ Snake* createSnake(int y, int x){
 		return snake;
 	}
 }	
-
-int moveOnKeyboard(){
-	int ch = getch();
-	switch(ch){
-		case KEY_LEFT:
-			return KEY_LEFT;
-			break;
-		case KEY_RIGHT:
-			return KEY_RIGHT;
-			break;
-		case KEY_UP:
-			return KEY_UP;
-			break;
-		case KEY_DOWN:
-			return KEY_DOWN;
-			break;
-		default:
-			NULL;
-	}
-}
-
-void showSnake(Snake* snake){
-	while(true){
-		mvaddch(snake->coordinatey, snake->coordinatex, ACS_DIAMOND);
-		wrefresh(stdscr);
-	}
-}
 
 void drawMenu(){
 	int coordx = (COLS / 2) - 1;
@@ -112,14 +84,38 @@ void shutdown(Screen* screen){
 	killScreen();
 }
 
-void moveSnake(Snake* snake) {
+void calculateCoordinate(Snake* snake, int ch){
+	int y = snake->coordinatey;
+	int x = snake->coordinatex;
+	switch(ch){
+		case KEY_LEFT:
+			x = x - 1;
+			break;
+		case KEY_RIGHT:
+			x = x + 1;
+			break;
+		case KEY_UP:
+			y = y - 1;
+			break;
+		case KEY_DOWN:
+			y = y + 1;
+			break;
+		default:
+			break;
+	}
+	printw("%d\n", y);
+	printw("%d", x);
+
+	snake->coordinatex = x;
+	snake->coordinatey = y;
+}
+
+void moveSnake(Snake* snake, int ch) {
+	calculateCoordinate(snake, ch);
 	while(snake != NULL){
-		snake->coordinatex = snake->coordinatex - 1;
 		mvaddch(snake->coordinatey, snake->coordinatex, ACS_DIAMOND);
-		refresh();
 		snake = snake->next;
 	}
-
 }
 
 
@@ -131,37 +127,37 @@ int main(int argc, char const *argv[]){
 	cbreak();
 	keypad(stdscr, TRUE); //teclas do teclado funcionarem
 	curs_set(0); //desabilitar cursor
-	timeout(100);
+	timeout(1000);
 	getmaxyx(stdscr, ymax, xmax); // recupera as as coordenadas da tela -1
 	
 	Screen* screen = createScreen(createSnake(ymax, xmax), ymax, xmax);
-	
+	int key = KEY_RIGHT;
 	while(true){
 		clear();
-		moveSnake(screen->snake);
-		int key = getch();
+		moveSnake(screen->snake, key);
+		key = getch();
     	switch(key){
     		case KEY_LEFT:
-    		//	showSnake(screen->snake, );
+    			//moveSnake(screen->snake, key);
 				refresh();
 				break;
     		case KEY_RIGHT:
-			//	showSnake(screen->snake, KEY_RIGHT);
-    			refresh();
+				//moveSnake(screen->snake, KEY_RIGHT);
+				refresh();
 				break;
     		case KEY_UP:
-			//	showSnake(screen->snake, KEY_UP);
-    			refresh();
+				//moveSnake(screen->snake, KEY_LEFT);
+				refresh();
 				break;
     		case KEY_DOWN:
-			//	showSnake(screen->snake, KEY_DOWN);
+				//moveSnake(screen->snake, KEY_LEFT);
 				refresh();
 				break;
 			default:
 				break;
 			}
 	}
-	mvaddch(screen->snake->coordinatey-10, screen->snake->coordinatex-1, ACS_BLOCK);
+	//mvaddch(screen->snake->coordinatey-10, screen->snake->coordinatex-1, ACS_BLOCK);
 	//showSnake(screen->snake, KEY_RIGHT);
 	getch(); killScreen();
     return 0;
