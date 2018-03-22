@@ -4,6 +4,11 @@
 #include <time.h>
 
 
+// #define DOWN 0402		
+// #define UP 0403		
+// #define LEFT 0404		
+// #define RIGHT 0405
+
 typedef struct snake Snake;
 struct snake{
 	int coordinatey;
@@ -111,53 +116,48 @@ void moveSnake(Snake* snake, int ch) {
 	while(snake != NULL){
 		calculateCoordinate(snake, ch);
 		mvaddch(snake->coordinatey, snake->coordinatex, ACS_DIAMOND);
-		refresh();
+		//refresh();
 		snake = snake->next; 
 	}
+}
+
+int d(int previous){
+	int ch = getch();
+  switch (ch) {
+    case KEY_LEFT:
+      if (previous != KEY_RIGHT) return KEY_LEFT;
+    case KEY_RIGHT:
+      if (previous != KEY_LEFT) return KEY_RIGHT;
+    case KEY_DOWN:
+      if (previous != KEY_UP) return KEY_DOWN;
+    case KEY_UP:
+      if (previous != KEY_DOWN) return KEY_UP;
+    default:
+      return previous;
+  }
 }
 
 
 //a coordenada y é de cima pra baixo no ecrã
 int main(int argc, char const *argv[]){	
-	int xmax, ymax;
+	int y, x;
 	initscr();
 	noecho();	
 	cbreak();
 	keypad(stdscr, TRUE); //teclas do teclado funcionarem
 	curs_set(0); //desabilitar cursor
 	timeout(100);
-	getmaxyx(stdscr, ymax, xmax); // recupera as as coordenadas da tela -1
+	getmaxyx(stdscr, y, x); // recupera as as coordenadas da tela -1
 	
-	Screen* screen = createScreen(createSnake(ymax, xmax), ymax, xmax);
-
+	Screen* screen = createScreen(createSnake(y, x), y, x);
+	int key = KEY_RIGHT;
 	while(true){
 		clear();
-		moveSnake(screen->snake, KEY_RIGHT);
-		int key = getch();
-    	switch(key){
-    		case KEY_LEFT:
-    			moveSnake(screen->snake, key);
-				refresh();
-				break;
-    		case KEY_RIGHT:
-				moveSnake(screen->snake, key);
-				refresh();
-				break;
-    		case KEY_UP:
-				moveSnake(screen->snake, key);
-				refresh();
-				break;
-    		case KEY_DOWN:
-				moveSnake(screen->snake, key);
-				refresh();
-				break;
-			default:
-				break;
-			}
+		moveSnake(screen->snake, key);
+		refresh();
+		key = d(key);
+		//refresh();
 	}
-	//mvaddch(screen->snake->coordinatey-10, screen->snake->coordinatex-1, ACS_BLOCK);
-	//showSnake(screen->snake, KEY_RIGHT);
-	getch(); 
 	freeSnake(screen->snake);
 	freeBoard(screen); 
 	killScreen();
