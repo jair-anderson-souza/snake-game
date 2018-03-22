@@ -3,11 +3,13 @@
 #include <ncurses.h>
 #include <time.h>
 
-
-// #define DOWN 0402		
-// #define UP 0403		
-// #define LEFT 0404		
-// #define RIGHT 0405
+// #define getmaxyx(win,y,x)	(y = getmaxy(win), x = getmaxx(win))
+#define size_screen_y getmaxy(stdscr)
+#define size_screen_x getmaxx(stdscr)
+#define DOWN 0402		
+#define UP 0403		
+#define LEFT 0404		
+#define RIGHT 0405
 
 typedef struct snake Snake;
 struct snake{
@@ -124,14 +126,14 @@ void moveSnake(Snake* snake, int ch) {
 int d(int previous){
 	int ch = getch();
   switch (ch) {
-    case KEY_LEFT:
-      if (previous != KEY_RIGHT) return KEY_LEFT;
-    case KEY_RIGHT:
-      if (previous != KEY_LEFT) return KEY_RIGHT;
-    case KEY_DOWN:
-      if (previous != KEY_UP) return KEY_DOWN;
-    case KEY_UP:
-      if (previous != KEY_DOWN) return KEY_UP;
+    case LEFT:
+      if (previous != RIGHT) return LEFT;
+    case RIGHT:
+      if (previous != LEFT) return RIGHT;
+    case DOWN:
+      if (previous != UP) return KEY_DOWN;
+    case UP:
+      if (previous != DOWN) return UP;
     default:
       return previous;
   }
@@ -140,16 +142,14 @@ int d(int previous){
 
 //a coordenada y é de cima pra baixo no ecrã
 int main(int argc, char const *argv[]){	
-	int y, x;
 	initscr();
 	noecho();	
 	cbreak();
 	keypad(stdscr, TRUE); //teclas do teclado funcionarem
 	curs_set(0); //desabilitar cursor
 	timeout(100);
-	getmaxyx(stdscr, y, x); // recupera as as coordenadas da tela -1
 	
-	Screen* screen = createScreen(createSnake(y, x), y, x);
+	Screen* screen = createScreen(createSnake(size_screen_y, size_screen_x), size_screen_y, size_screen_x);
 	int key = KEY_RIGHT;
 	while(true){
 		clear();
