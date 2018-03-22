@@ -3,8 +3,14 @@
 #include <ncurses.h>
 #include <time.h>
 
+//https://www.mkssoftware.com/docs/man3/curs_attr.3.asp
+//https://www.mkssoftware.com/docs/man3/curs_color.3.asp
+
 #define size_screen_y getmaxy(stdscr)
 #define size_screen_x getmaxx(stdscr)
+// #define begin_screen_y getbegy(stdscr)
+// #define begin_screen_x getbegx(stdscr)
+
 #define down 0402		
 #define up 0403		
 #define left 0404		
@@ -24,11 +30,11 @@ struct screen{
 	int coordinatex;
 };
 
-Screen* createScreen(Snake* snake, int y, int x){
+Screen* createScreen(Snake* snake){
 	Screen* screen = (Screen*) malloc(sizeof(Screen));	
 	if(screen != NULL){
-		screen->coordinatey = y;
-		screen->coordinatex = x;
+		screen->coordinatey = size_screen_y;
+		screen->coordinatex = size_screen_x;
 		screen->snake = snake;
 		return screen;
 	}
@@ -41,9 +47,9 @@ int calculateMiddleScreen(int value){
 }
 
 //return some error e.g.
-Snake* createSnake(int y, int x){
-	int middley = calculateMiddleScreen(y);
-	int middlex = calculateMiddleScreen(x);
+Snake* createSnake(){
+	int middley = calculateMiddleScreen(size_screen_y);
+	int middlex = calculateMiddleScreen(size_screen_x);
 	Snake* snake = (Snake*) malloc(sizeof(Snake));	
 	if(snake != NULL){
 		snake->coordinatey = middley;
@@ -141,6 +147,9 @@ int d(int previous){
 
 //a coordenada y é de cima pra baixo no ecrã
 int main(int argc, char const *argv[]){	
+	// printw("%d", begin_screen_y);
+	// printw("%d", begin_screen_x);
+	// getch();
 	initscr();
 	noecho();	
 	cbreak();
@@ -148,15 +157,17 @@ int main(int argc, char const *argv[]){
 	curs_set(0); //desabilitar cursor
 	timeout(100);
 	
-	Screen* screen = createScreen(createSnake(size_screen_y, size_screen_x), size_screen_y, size_screen_x);
+	Screen* screen = createScreen(createSnake());
 	int key = KEY_RIGHT;
 	while(true){
 		clear();
 		moveSnake(screen->snake, key);
 		refresh();
 		key = d(key);
-		//refresh();
+
 	}
+
+	
 	freeSnake(screen->snake);
 	freeBoard(screen); 
 	killScreen();
