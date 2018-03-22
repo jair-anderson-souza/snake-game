@@ -3,13 +3,12 @@
 #include <ncurses.h>
 #include <time.h>
 
-// #define getmaxyx(win,y,x)	(y = getmaxy(win), x = getmaxx(win))
 #define size_screen_y getmaxy(stdscr)
 #define size_screen_x getmaxx(stdscr)
-#define DOWN 0402		
-#define UP 0403		
-#define LEFT 0404		
-#define RIGHT 0405
+#define down 0402		
+#define up 0403		
+#define left 0404		
+#define right 0405
 
 typedef struct snake Snake;
 struct snake{
@@ -126,14 +125,14 @@ void moveSnake(Snake* snake, int ch) {
 int d(int previous){
 	int ch = getch();
   switch (ch) {
-    case LEFT:
-      if (previous != RIGHT) return LEFT;
-    case RIGHT:
-      if (previous != LEFT) return RIGHT;
-    case DOWN:
-      if (previous != UP) return KEY_DOWN;
-    case UP:
-      if (previous != DOWN) return UP;
+    case left:
+      if (previous != right) return left;
+    case right:
+      if (previous != left) return right;
+    case down:
+      if (previous != up) return down;
+    case up:
+      if (previous != down) return up;
     default:
       return previous;
   }
