@@ -22,7 +22,13 @@ struct screen{
 	int coordinatey;
 	int coordinatex;
 };
-
+/**typedef struct comida Comida;
+struct comida{
+     Comida* comida;
+     int coordinatex;
+     int coordinatey;
+	/* data /
+};*/
 Screen* createScreen(Snake* snake, int y, int x){
 	Screen* screen = (Screen*) malloc(sizeof(Screen));	
 	if(screen != NULL){
@@ -50,6 +56,34 @@ Snake* createSnake(int y, int x){
 		return snake;
 	}
 }	
+//Negao
+/*comida* createComida(int y,int x){
+	int middley = calculateMiddleScreen(y);
+	int middlex = calculateMiddleScreen(x);
+    Comida* comida = (Comida*) malloc(sizeof(Comida));
+	if(comida == NULL){
+		comida->coordinatey = middley;
+		comida->coordinatex = middlex;
+		return comida;
+	}
+}
+//criar comida ...
+/
+void gerarComida(){
+	int gerar = rand() % 10;
+	if(timeout<5){
+		coordinatex = gerar;
+		coordinatey = gerar;
+		return comida;
+	}else if (timeout>5)
+	{
+		coordinatey = gerar;
+		coordinatex = gerar;
+		return comida;
+	}
+	break;
+}
+*/
 
 void drawMenu(){
 	int coordx = (COLS / 2) - 1;
