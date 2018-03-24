@@ -22,13 +22,15 @@ struct screen{
 	int coordinatey;
 	int coordinatex;
 };
-/**typedef struct comida Comida;
+//Strutrura da comida
+typedef struct comida Comida:
 struct comida{
-     Comida* comida;
-     int coordinatex;
-     int coordinatey;
-	/* data /
-};*/
+	Comida* comida;
+	int coordinatex;
+	int coordinatey;
+
+};
+
 Screen* createScreen(Snake* snake, int y, int x){
 	Screen* screen = (Screen*) malloc(sizeof(Screen));	
 	if(screen != NULL){
@@ -56,15 +58,15 @@ Snake* createSnake(int y, int x){
 		return snake;
 	}
 }	
-//Negao
-/*comida* createComida(int y,int x){
+//Negao Necessario gerar o desenho
+comida* createComida(int y,int x){
 	int middley = calculateMiddleScreen(y);
 	int middlex = calculateMiddleScreen(x);
     Comida* comida = (Comida*) malloc(sizeof(Comida));
 	if(comida == NULL){
 		comida->coordinatey = middley;
 		comida->coordinatex = middlex;
-		return comida;
+		return draw;
 	}
 }
 //criar comida ...
@@ -83,7 +85,6 @@ void gerarComida(){
 	}
 	break;
 }
-*/
 
 void drawMenu(){
 	int coordx = (COLS / 2) - 1;
@@ -189,6 +190,16 @@ int main(int argc, char const *argv[]){
 		clear();
 		moveSnake(screen->snake, key);
 		refresh();
+		key = d(key);
+		//refresh();
+	}
+	/* verificar para gerar a comida */
+	Screen* screen = createComida(createComida(y, x), y, x);
+	int keiy = KEY_RIGHT;
+	while(true){
+		clear();
+		refresh();
+		gerarComida();
 		key = d(key);
 		//refresh();
 	}
