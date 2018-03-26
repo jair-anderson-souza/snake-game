@@ -58,24 +58,6 @@ Snake* createSnake(){
 	}
 }	
 
-void drawMenu(){
-	int coordx = (COLS / 2) - 1;
-	int coordy = (LINES / 2) - 1;
-	mvprintw(coordy, coordx-9, "Snake Game");
-	mvprintw(coordy+1, coordx-14, "Press Enter to Start");
-	mvprintw(coordy+2, coordx-12, "Press ESC to Exit");
-}
-
-void draw(int *ymax, int *xmax){
-	initscr();
-	noecho();	
-	cbreak();
-	keypad(stdscr, TRUE); //teclas do teclado funcionarem
-	curs_set(0); //desabilitar cursor
-	timeout(5000);
-	getmaxyx(stdscr, *ymax, *xmax); // recupera as as coordenadas da tela -1
-}
-
 void killScreen(){
 	endwin();
 }
@@ -88,68 +70,113 @@ void freeBoard(Screen* screen){
     free(screen);
 }
 
-void shutdown(Screen* screen){
-	printw("O programa foi finalizado, aperte Enter pra sair!!");
-	getch();
-	freeSnake(screen->snake);
-	freeBoard(screen);
-	killScreen();
+
+Snake* createNewSnake(int y, int x){
+	Snake* snake = (Snake*) malloc(sizeof(Snake));
+	snake->coordinatey = y;
+	snake->coordinatex = x;
 }
 
-void calculateCoordinate(Snake* snake, int ch){
-	int y = snake->coordinatey;
-	int x = snake->coordinatex;
-	switch(ch){
-		case KEY_LEFT:
+Snake* calculateCoordinate(int y, int x, int newDirection){
+	switch(newDirection){
+		case left:
 			x = x - 1;
 			break;
-		case KEY_RIGHT:
+		case right:
 			x = x + 1;
 			break;
-		case KEY_UP:
+		case up:
 			y = y - 1;
 			break;
-		case KEY_DOWN:
+		case down:
 			y = y + 1;
 			break;
 		default:
 			break;
 	}
-	snake->coordinatex = x;
-	snake->coordinatey = y;
+	return createNewSnake(y, x);
 }
 
-void moveSnake(Snake* snake, int ch) {
+
+int keyPressed(int previous){
+	int keyPressed = getch();
+  	switch (keyPressed) {
+    	case left:
+			if (previous != right){ 
+				return left;
+	  		}
+		case right:
+      		if (previous != left){ 
+			  return right;
+			}
+    	case down:
+      		if (previous != up){ 
+			  return down;
+			  }
+    	case up:
+			if (previous != down){
+				 return up;
+			}
+		default:
+      		return previous;
+  	}
+}
+
+void d(Snake* snake, Snake* snakeTemp){
 	while(snake != NULL){
-		calculateCoordinate(snake, ch);
+		snake->coordinatey == snakeTemp->coordinatey && snake->coordinatex == snakeTemp->coordinatex;
+		snake = snake->next;
+	}
+}
+
+void printSnake(Snake* snake) {
+	while(snake != NULL){
 		mvaddch(snake->coordinatey, snake->coordinatex, ACS_DIAMOND);
-		//refresh();
 		snake = snake->next; 
 	}
 }
 
-int d(int previous){
-	int ch = getch();
-  switch (ch) {
-    case left:
-      if (previous != right) return left;
-    case right:
-      if (previous != left) return right;
-    case down:
-      if (previous != up) return down;
-    case up:
-      if (previous != down) return up;
-    default:
-      return previous;
-  }
+
+//novo cálculo passando as coordenadas
+Snake* calculateNextCell(Screen* screen, Snake* newSnake){
+	newSnake->next = screen->snake;
+	screen->snake = newSnake;
+	Snake* snakeTemp = screen->snake;
+
+	while(snakeTemp->next->next){
+		snakeTemp = snakeTemp->next;
+	}
+	free(snakeTemp->next);
+	snakeTemp->next = NULL;
 }
+
+int nextMovement(Screen* screen, int movement){
+	
+	Snake* snakeTemp = calculateCoordinate(screen->snake->coordinatey, screen->snake->coordinatex, movement);
+	// snakeTemp->next = snake;
+	calculateNextCell(screen, snakeTemp);
+	
+	
+	// snakeTemp->next = snake;
+    // snake = snakeTemp;
+
+	//checkNextMovementIsTheSame
+		
+	//checkTail
+	//d(snake, snakeTemp);
+
+	//check food
+
+	//finally, move snake
+	
+	printSnake(screen->snake);
+
+}
+
 
 
 //a coordenada y é de cima pra baixo no ecrã
 int main(int argc, char const *argv[]){	
-	// printw("%d", begin_screen_y);
-	// printw("%d", begin_screen_x);
-	// getch();
 	initscr();
 	noecho();	
 	cbreak();
@@ -157,98 +184,35 @@ int main(int argc, char const *argv[]){
 	curs_set(0); //desabilitar cursor
 	timeout(100);
 	
-	Screen* screen = createScreen(createSnake());
-	int key = KEY_RIGHT;
-	while(true){
-		clear();
-		moveSnake(screen->snake, key);
-		refresh();
-		key = d(key);
+	// Screen* screen = createScreen(createSnake());
 
-	}
 
 	
+	Snake* snake1 = (Snake*) malloc(sizeof(Snake));
+	snake1->coordinatey = 10;
+	snake1->coordinatex = 10;
+	
+	Snake* snake2 = (Snake*) malloc(sizeof(Snake));
+	snake2->coordinatey = 10;
+	snake2->coordinatex = 9;
+	
+	snake1->next = snake2;
+
+	Screen* screen = createScreen(snake1);
+	int key = right;
+	while(true){
+		clear();
+		printSnake(screen->snake);
+		//moveSnake(screen->snake, key);
+		key = keyPressed(key);
+		nextMovement(screen, key);
+		refresh();
+		
+
+	}	
 	freeSnake(screen->snake);
 	freeBoard(screen); 
 	killScreen();
     return 0;
 }
 	 
-
-
-
-	//key = nextMove(screen->snake);
-
-	//showSnake(screen->snake);
-
-
-
-	//Essa função é o Menu que eu ainda pretendo fazer
-	//drawMenu();
-
-	
-	//moveSnake(screen->snake);
-
-	// refresh();
-
-	/*while(true) {
-    	int key = getch();
-    	switch(key){
-    		case KEY_LEFT:
-    			display_points(screen->snake);
-				refresh();
-				display_points2(screen->snake);
-				break;
-    		case KEY_RIGHT:
-				display_points(screen->snake);
-    			refresh();
-				break;
-    		case KEY_UP:
-    			display_points(screen->snake);
-				refresh();
-				break;
-    		case KEY_DOWN:
-				display_points(screen->snake);
-    			refresh();
-				break;
-    	}
-	}
-//27 ESC
-//10 ENTER
-
-	//if(key == 27){
-	//	printw("Jogo Finalizado", key);
-	//	killScreen();
-	//	exit(0);
-	//}
-
-	
-
-
-	//mvaddch = esse comando coloca o caracter no X,Y específico
-	/*while(board->snake) {
-		clear();
-    	mvaddch(board->snake->coordinatex, board->snake->coordinatey, ACS_DIAMOND);
-    	board->snake = board->snake->next;
-    	refresh();
-    	int key = getch();
-    	switch(key){
-    		case KEY_LEFT:
-    			display_points();
-				mvaddch(board->snake->coordinatex, board->snake->coordinatey-1, ACS_DIAMOND);
-    			break;
-    		case KEY_RIGHT:
-    			mvaddch(board->snake->coordinatex+1, board->snake->coordinatey, ACS_DIAMOND);
-    			break;
-    		case KEY_UP:
-    			mvaddch(board->snake->coordinatex, board->snake->coordinatey+1, ACS_DIAMOND);
-    			break;
-    		case KEY_DOWN:
-    			mvaddch(board->snake->coordinatex, board->snake->coordinatey-1, ACS_DIAMOND);
-    			refresh();
-    			break;
-    	}
-
-  	}
-*/
-
